@@ -1,0 +1,44 @@
+{
+  "name": "easychat",
+  "version": "1.0.0",
+  "description": "easy chatting online",
+  "main": "app.js",
+  "scripts": {
+    "dev": "redis-server & NODE_ENV='development' nodemon ./bin/www",
+    "prod": "redis-server & NODE_ENV='production' nodemon ./bin/www",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "TangYiDa",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.5.5",
+    "co-body": "^6.0.0",
+    "debug": "^4.1.0",
+    "ejs": "^2.6.1",
+    "jsonwebtoken": "^8.5.1",
+    "koa": "^2.7.0",
+    "koa-body": "^4.1.0",
+    "koa-bodyparser": "^3.2.0",
+    "koa-jwt": "^3.5.1",
+    "koa-multer": "^1.0.2",
+    "koa-router": "^7.4.0",
+    "koa-views": "^6.2.0",
+    "module-alias": "^2.2.0",
+    "mysql": "^2.16.0",
+    "mysql2": "^1.6.5",
+    "nodemailer": "^6.1.0",
+    "nodemailer-smtp-transport": "^2.7.4",
+    "redis": "^2.8.0",
+    "sequelize": "^5.9.4",
+    "socket.io": "^2.2.0",
+    "socketio-jwt": "^4.5.0",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.1"
+  },
+  "_moduleAliases": {
+    "@root": ".",
+    "@src": "src/"
+  }
+}
