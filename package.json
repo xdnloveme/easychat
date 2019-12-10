@@ -4,8 +4,8 @@
   "description": "easy chatting online",
   "main": "app.js",
   "scripts": {
-    "dev": "redis-server & NODE_ENV='development' nodemon ./bin/www",
-    "prod": "redis-server & NODE_ENV='production' nodemon ./bin/www",
+    "dev": "NODE_ENV='development' nodemon ./bin/www",
+    "prod": "NODE_ENV='production' nodemon ./bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "TangYiDa",
