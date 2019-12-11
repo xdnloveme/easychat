@@ -5,12 +5,7 @@
  */
 const namespace = require('../namespace');
 const { client } = require('@root/config/redisConfig');
-const {
-  isFriendsByOpenId,
-  getUserInfoByOpenId,
-  searchByOpenId,
-  getContactsListService,
-} = require('@src/service/user/user');
+const { isFriendsByOpenId, searchByOpenId, getContactsListService } = require('@src/service/user/user');
 const {
   getLatestRequest,
   addFriendRequest,
@@ -28,13 +23,13 @@ const STORE_NAME = 'EASYCHAT-ONLINE-STORE';
 /**
  * 移除redis中hash表的在线用户
  * @param {object} socket socket对象
- * @param {string} userId 用户id（非openId）
+ * @param {string} openId 用户公开id
  */
-const removeOnlineUser = async (socket, userId) => {
-  await client.hdelAsync(STORE_NAME, userId);
+const removeOnlineUser = async (socket, openId) => {
+  await client.hdelAsync(STORE_NAME, openId);
 };
 
-// 和clients同步在线用户hash表
+// 和clients同步在线用户hash表(后续开新线程)
 const syncOnlineStore = socket => {
   namespace.clients(async (error, clients) => {
     if (error) throw error;
@@ -77,26 +72,26 @@ const filterRequestList = list => {
 /**
  * 向redis在线hash表中添加用户
  * @param {object} socket socket对象
- * @param {string} userId 用户id（非openId）
+ * @param {string} openId 用户公开id
  */
-const addOnlineUser = async (socket, userId) => {
-  const isExistsSocketId = await client.hgetAsync(STORE_NAME, userId);
+const addOnlineUser = async (socket, openId) => {
+  const isExistsSocketId = await client.hgetAsync(STORE_NAME, openId);
   if (isExistsSocketId) {
     // 如果此账号还在线，则发送给另外一个socketId，这代表他被顶号了
     namespace.to(isExistsSocketId).emit('squeezed-out', '你的号已在其他地方上线！');
   }
 
-  await client.hsetAsync(STORE_NAME, userId, socket.id);
-  await syncOnlineStore(socket, userId);
+  await client.hsetAsync(STORE_NAME, openId, socket.id);
+  await syncOnlineStore(socket, openId);
 };
 
 /**
  * 根据用户id返回在线socketId，可以判断是否在线
- * @param {string} targetId 用户id
+ * @param {string} openId 用户公开ID
  * @return {string} socket.id 返回socketId值
  */
-const isOnline = async targetId => {
-  return await client.hgetAsync(STORE_NAME, targetId);
+const isOnline = async openId => {
+  return await client.hgetAsync(STORE_NAME, openId);
 };
 
 const emitRequestListByOpenId = async (socket, openId) => {
@@ -115,12 +110,12 @@ module.exports.privateMessage = socket => {
 
     const isFriend = await isFriendsByOpenId(sourceOpenId, targetOpenId);
     if (!isFriend) {
-      socket.emit('error', new ServiceError(1, '你们还不是朋友，无法私聊'));
+      callback(false, '你们还不是朋友，无法私聊');
       return;
     }
 
-    const targetId = isFriend.userInfo['id'];
-    const targetSocketId = await isOnline(targetId);
+    const openId = isFriend.userInfo['openId'];
+    const targetSocketId = await isOnline(openId);
     if (!targetSocketId) {
       console.log('不在线');
       // ...
@@ -147,17 +142,19 @@ module.exports.privateMessage = socket => {
 
 // 添加新的在线用户方法
 module.exports.addChatUser = async socket => {
-  const { id } = socket.decode_payload;
+  const { publicInfo } = socket.decode_payload;
+  const { openId } = publicInfo;
   debug_service('解析token=', socket.decode_payload);
-  await addOnlineUser(socket, id);
+  await addOnlineUser(socket, openId);
 };
 
 // 移除在线用户
 module.exports.removeChatUser = async socket => {
-  const { id } = socket.decode_payload;
+  const { publicInfo } = socket.decode_payload;
+  const { openId } = publicInfo;
   debug_service('解析token=', socket.decode_payload);
   // 移除在线（直接异步执行，不管返回）
-  await removeOnlineUser(socket, id);
+  await removeOnlineUser(socket, openId);
 };
 
 module.exports.init = async socket => {
@@ -187,11 +184,9 @@ module.exports.addFriendRequest = socket => {
 
     requestInfo = filterRequestList(requestInfo);
 
-    const userInfo = await getUserInfoByOpenId(openId);
     const requestUserPublicInfo = await searchByOpenId(requestOpenId);
-    const targetId = userInfo.id;
 
-    const targetSocketId = await isOnline(targetId);
+    const targetSocketId = await isOnline(openId);
     if (targetSocketId) {
       namespace.to(targetSocketId).emit('addFriendRequest-received', {
         message,
@@ -238,6 +233,13 @@ module.exports.handleFriendRequest = socket => {
         const contactsList = await getContactsListService(openId);
         const friendRequestList = await emitRequestListByOpenId(socket, openId);
         const requestList = friendRequestList.find(item => item.openId === openId);
+
+        const targetSocketId = await isOnline(requestOpenId);
+        if (targetSocketId) {
+          const requestContactsList = await getContactsListService(requestOpenId);
+          namespace.to(targetSocketId).emit('contactsList-update', requestContactsList);
+        }
+
         return callback(
           createSuccessResponse({
             message: '成功添加好友',
