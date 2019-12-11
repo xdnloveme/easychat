@@ -1,5 +1,6 @@
 module.exports = () => {
   return async (ctx, next) => {
+    // 在生产环境下的跨域问题
     ctx.set("Access-Control-Allow-Origin", "http://localhost:8080");
     ctx.set("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
     ctx.set("Access-Control-Allow-Credentials", true);

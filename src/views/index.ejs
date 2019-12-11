@@ -35,7 +35,7 @@
       xhr.onreadystatechange = xhrResponse;
       xhr.onerror = xhrError;
 
-      xhr.open('post', 'http://localhost:3003/api/user/public/veryifyActiveKey', true);
+      xhr.open('post', '/api/user/public/veryifyActiveKey', true);
       xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8');
       xhr.setRequestHeader('Authorization', `Bearer ${getQueryVariable('active_key')}`);
       xhr.send(`username=${getQueryVariable('username')}`);
