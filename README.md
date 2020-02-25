@@ -5,8 +5,17 @@
 
 ## 安装
 
-````
+```javascript
     npm install -g nodemon
+```
+
+```javascript
+    npm install
+```
+
+```javascript
+    npm run dev
+```
 
 # 文档
 
