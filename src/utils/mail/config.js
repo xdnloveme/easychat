@@ -3,6 +3,6 @@ module.exports = {
     email: {
         service: '126',
         user: 'xdnloveme@126.com',
-        pass: 'a7869250017A'
+        pass: 'XXXXXXXXXXXX'
     }
 }
