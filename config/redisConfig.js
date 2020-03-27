@@ -10,7 +10,7 @@ bluebird.promisifyAll(redis);
 const client = redis.createClient();
 
 client.on('error', function(err) {
-  console.log('Error ' + err);
+  debug_redis('Error ' + err);
 });
 
 client.monitor(function(err, res) {
