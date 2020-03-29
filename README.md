@@ -9,20 +9,20 @@
 
 全局安装nodemon
 
-```javascript
-	npm install -g nodemon
+```bash
+npm install -g nodemon
 ```
 
 安装依赖
 
 ```bash
-	npm install
+npm install
 ```
 
 运行在开发环境下
 
-```javascript
-  npm run dev
+```bash
+npm run dev
 ```
 
 # 文档
