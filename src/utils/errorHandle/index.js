@@ -5,7 +5,7 @@ const ERROR_MSG_DEFAULT = Object.assign({}, HTTP_CODE, SERVICE_CODE);
 
 function ServiceError (code, msg, data = null) {
   Error.call(this, '')
-
+  
   this.code = code
   this.msg = msg || ERROR_MSG_DEFAULT[code] || 'error';
   this.data = data;

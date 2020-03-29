@@ -6,6 +6,7 @@
 require('module-alias/register')
 
 const Koa = require('koa');
+const Boom = require('boom');
 const app = new Koa();
 const router = require('./router/index');
 const bodyParser = require('koa-bodyparser');
@@ -47,6 +48,16 @@ app.use(koaJwt({ secret: 'easychat-jwt_api-auth_Tang-Yi-Da'})
 }))
 
 // 统一路由入口
-app.use(router.routes()).use(router.allowedMethods())
+app.use(router.routes()).use(router.allowedMethods({
+  throw: true,
+  notImplemented: () => {
+    const BoomNT = Boom.notImplemented();
+    throw new HttpError(BoomNT.output.statusCode)
+  },
+  methodNotAllowed: () => {
+    const BoomNA = Boom.methodNotAllowed();
+    throw new HttpError(BoomNA.output.statusCode)
+  }
+}))
 
 module.exports = app;
