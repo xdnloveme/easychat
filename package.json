@@ -21,7 +21,6 @@
     "koa-body": "^4.1.0",
     "koa-bodyparser": "^4.3.0",
     "koa-jwt": "^3.5.1",
-    "koa-multer": "^1.0.2",
     "koa-router": "^7.4.0",
     "koa-views": "^6.2.1",
     "module-alias": "^2.2.0",
