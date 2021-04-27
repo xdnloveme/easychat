@@ -28,7 +28,7 @@
     "mysql2": "^1.6.5",
     "nodemailer": "^6.1.0",
     "nodemailer-smtp-transport": "^2.7.4",
-    "redis": "^2.8.0",
+    "redis": "^3.1.1",
     "sequelize": "^5.15.1",
     "socket.io": "^2.2.0",
     "socketio-jwt": "^4.5.0",
